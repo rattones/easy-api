@@ -5,7 +5,8 @@ class Request
 {
     public static function _GET(string $id= null) : array
     {
-        if ( empty($_GET) and $_SERVER['HTTP_CONTENT_TYPE'] == 'application/json' ) {
+        // http_content_type can not be sent some times
+        if ( empty($_GET) and @$_SERVER['HTTP_CONTENT_TYPE'] == 'application/json' ) {
             $_GET= json_decode(file_get_contents('php://input'), true);
         }
 
@@ -21,7 +22,8 @@ class Request
 
     public static function _POST(string $id= null) : array
     {
-        if ( empty($_POST) and $_SERVER['HTTP_CONTENT_TYPE'] == 'application/json' ) {
+        // http_content_type can not be sent some times
+        if ( empty($_POST) and @$_SERVER['HTTP_CONTENT_TYPE'] == 'application/json' ) {
             $_POST= json_decode(file_get_contents('php://input'), true);
         } 
 
