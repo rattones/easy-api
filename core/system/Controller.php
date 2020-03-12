@@ -63,6 +63,10 @@ class Controller extends Request
         '511' => '511 Network Authentication Required'
     ];
 
+    private static $callback= null;
+
+    private static $CORSOrigin= null;
+
     public function __construct()
     {
         // @TODO need?
@@ -71,21 +75,52 @@ class Controller extends Request
     public static function response(int $status, array $data= null)
     {
         // for apache with .htaccess file
-        if (!headers_sent()) {
-            http_response_code($status);
+        // if (!headers_sent()) {
+        //     http_response_code($status);
+        // }
+        header("HTML/1.1 ".self::$status[$status], false, $status);
+        header("Connection: keep-alive");   
+        header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
+        header('Content-Type: application/json; charset=UTF-8');
+        if (!is_null(self::$CORSOrigin)) {
+            header("Access-Control-Allow-Headers: Authorization, PASS_TOKEN, X-Requested-With, accept", false);
+            header("Access-Control-Allow-Methods: GET,PUT,POST,DELETE,HEAD,OPTIONS", false);
+            header("Access-Control-Allow-Origin: ".self::$CORSOrigin, false);
+            header('Access-Control-Max-Age: 1000');
+            header("Vary: Accept-Encoding, Origin", false); // necessary whn origin is not '*'
         }
-        // header("HTML/1.1 ".self::$status[$status], false, $status);
-        // header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
-        // header('Content-Type: application/json; charset=UTF-8');
-        // header("Access-Control-Allow-Origin: localhost:*");
         if (!empty($data)) {
-            echo json_encode($data);
+            if (self::$callback === "") {
+                echo json_encode($data);
+            } else {
+                $callback= (is_null(self::$callback))? 'null': self::$callback;
+                $jsonData= json_encode($data);
+                echo "{$callback}({$jsonData})";
+            }
         }
         // exiting application to avoid after controller response extra executions
         exit(0);
     }
 
-    public static function execute(string $class, string $method, array $params)
+    public static function preflight()
+    {
+        // die("aki");
+        header("HTML/1.1 ".self::$status[100], false, 100);
+        header("Connection: keep-alive");   
+        // header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
+        // header('Content-Type: application/json; charset=UTF-8');
+        if (!is_null(self::$CORSOrigin)) {
+            header("Access-Control-Allow-Headers: Origin, X-Requested-With, Accept, Content-Type", false);
+            header("Access-Control-Allow-Methods: GET,PUT,POST,DELETE,HEAD,OPTIONS", false);
+            header("Access-Control-Allow-Origin: *", false); #.self::$CORSOrigin, false);
+            header('Access-Control-Max-Age: 1000');
+            header("Vary: Origin", false); // necessary whn origin is not '*'
+        }
+
+        exit(0);
+    }
+
+    public static function execute(string $class, string $method, array $params, string $callback= null)
     {
         $class= "app\controller\\{$class}";
 
@@ -93,6 +128,7 @@ class Controller extends Request
             $object= new $class();
             
             if (method_exists($object, $method)) {
+                self::$callback= $callback;
                 call_user_func_array([$object, $method], $params);                
             } else {
                 self::response(404);
@@ -103,7 +139,13 @@ class Controller extends Request
 
     }
 
+    public static function setCORSOrigin(string $passToken) 
+    {
+        self::$CORSOrigin= $passToken;
+    }
+
     public static function debug($data) {
+        $data= var_dump($data);
         self::response(200, ['debug'=>$data]);
     }
 }

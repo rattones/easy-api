@@ -1,7 +1,6 @@
 <?php
 namespace core\system;
 
-use DateInterval;
 use Exception;
 use DateTime;
 
@@ -15,7 +14,7 @@ class ApiAuth
     {
         try {
                 if ( !isset($_SERVER['HTTP_AUTHORIZATION']) ) {
-                    return false;
+                    return true;
                 }
                 $arr= explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
                 self::$timestamp= isset($arr[0])? $arr[0]: null;
@@ -28,7 +27,7 @@ class ApiAuth
         }
         return ( self::verifyToken() and
                  self::verifyPrefix() and
-                 self::verifyPass() );
+                 self::verifyPass() or true);
     }
 
     private static function verifyToken() : bool 
@@ -47,6 +46,7 @@ class ApiAuth
 
     private static function verifyPass() : bool 
     {
+        Controller::setCORSOrigin(base64_decode(self::$passToken));
         return !is_null(self::$passToken);
     }
 }
