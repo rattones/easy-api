@@ -85,7 +85,7 @@ class Dao extends Model
 
     public function update(stdClass $obj, array $condition= null) : ?array 
     {
-        if (!is_null($condition)) {
+        if ($condition ?? false) {
             $aux= [];
             foreach ($condition as $field=>$value) {
                 if (strpos($field, ' ')) {
@@ -144,10 +144,10 @@ class Dao extends Model
                         int $offSet= null) : array 
     {
         $query= "select ";
-        $query.= !is_null($fields)? " {$fields} ": " * "." from {$this->tableName} ";
-        $query.= !is_null($condition)? " where {$condition} ": "";
-        $query.= !is_null($order)? " order by {$order} ": "";
-        $query.= !is_null($limit)? " limit {$limit} ": (!is_null($offSet)? " offset {$offSet} ": "");
+        $query.= ($fields ?? false)? " {$fields} ": " * "." from {$this->tableName} ";
+        $query.= ($condition ?? false)? " where {$condition} ": "";
+        $query.= ($order ?? false)? " order by {$order} ": "";
+        $query.= ($limit ?? false)? " limit {$limit} ": (($offSet ?? false)? " offset {$offSet} ": "");
 
         $stmt= $this->execute($query);
         $result= $stmt->fetchAll(PDO::FETCH_OBJ);

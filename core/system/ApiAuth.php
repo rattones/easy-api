@@ -32,7 +32,7 @@ class ApiAuth
 
     private static function verifyToken() : bool 
     {
-        return !is_null(self::$token);
+        return (bool)(self::$token ?? false);
     }
 
     private static function verifyPrefix() : bool
@@ -47,6 +47,6 @@ class ApiAuth
     private static function verifyPass() : bool 
     {
         Controller::setCORSOrigin(base64_decode(self::$passToken));
-        return !is_null(self::$passToken);
+        return (bool)(self::$passToken ?? false);
     }
 }
