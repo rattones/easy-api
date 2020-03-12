@@ -58,7 +58,11 @@ class Dao extends Model
         $arr= [];
         if ($stmt->rowCount()) {
             foreach ($this->keys as $key) {
-                $arr[$key]= $obj->{$key};
+                if (isset($obj->{$key})) {
+                    $arr[$key]= $obj->{$key};
+                } else {
+                    $arr[$key]= $this->lastInsertId();
+                }
             }
         }
 
