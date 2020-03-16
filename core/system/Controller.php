@@ -82,7 +82,7 @@ class Controller extends Request
         header("Connection: keep-alive");   
         header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
         header('Content-Type: application/json; charset=UTF-8');
-        if (!is_null(self::$CORSOrigin)) {
+        if (self::$CORSOrigin ?? false) {
             header("Access-Control-Allow-Headers: Authorization, PASS_TOKEN, X-Requested-With, accept", false);
             header("Access-Control-Allow-Methods: GET,PUT,POST,DELETE,HEAD,OPTIONS", false);
             header("Access-Control-Allow-Origin: ".self::$CORSOrigin, false);
@@ -93,7 +93,7 @@ class Controller extends Request
             if (self::$callback === "") {
                 echo json_encode($data);
             } else {
-                $callback= (is_null(self::$callback))? 'null': self::$callback;
+                $callback= self::$callback ?? 'null';
                 $jsonData= json_encode($data);
                 echo "{$callback}({$jsonData})";
             }
@@ -109,7 +109,7 @@ class Controller extends Request
         header("Connection: keep-alive");   
         // header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
         // header('Content-Type: application/json; charset=UTF-8');
-        if (!is_null(self::$CORSOrigin)) {
+        if (self::$CORSOrigin ?? false) {
             header("Access-Control-Allow-Headers: Origin, X-Requested-With, Accept, Content-Type", false);
             header("Access-Control-Allow-Methods: GET,PUT,POST,DELETE,HEAD,OPTIONS", false);
             header("Access-Control-Allow-Origin: *", false); #.self::$CORSOrigin, false);

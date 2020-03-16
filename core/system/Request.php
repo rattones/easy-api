@@ -13,7 +13,7 @@ class Request
         if (empty($_GET)) {
             Controller::response(204, $_GET);
         }
-        if ( !is_null($id) ) {
+        if ( ($id ?? false) ) {
             return (isset($_GET[$id]))? [$id=>$_GET[$id]]: [];
         } else {
             return $_GET;
@@ -31,7 +31,7 @@ class Request
             Controller::response(204, $_POST);
         }
 
-        if ( !is_null($id) ) {
+        if ( ($id ?? false) ) {
             return (isset($_POST[$id]))? [$id=>$_POST[$id]]: [];
         } else {
             return $_POST;
