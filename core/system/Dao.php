@@ -89,9 +89,9 @@ class Dao extends Model
             $aux= [];
             foreach ($condition as $field=>$value) {
                 if (strpos($field, ' ')) {
-                    $aux[]= " {$field} {$value} ";
+                    $aux[]= " {$field} '{$value}' ";
                 } else {
-                    $aux[]= " {$field} = {$value} ";
+                    $aux[]= " {$field} = '{$value}' ";
                 }
             }
         } else {
@@ -109,7 +109,7 @@ class Dao extends Model
             }
         }
         $sets= implode(",", $sets);
-
+        
         $query= "update {$this->tableName} set {$sets} where {$condition} ";
         $this->execute($query);
 
